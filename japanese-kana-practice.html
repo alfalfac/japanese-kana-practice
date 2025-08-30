@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日语五十音背诵练习</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', sans-serif;
+            background: linear-gradient(135deg, #1a365d, #2d5282, #3182ce);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: clamp(10px, 3vw, 20px);
+            font-size: clamp(14px, 2.5vw, 16px);
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: clamp(8px, 2vw, 15px);
+            padding: clamp(20px, 5vw, 40px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: clamp(20px, 5vw, 40px);
+        }
+
+        .title {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            color: #e2e8f0;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            color: #cbd5e0;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: clamp(10px, 3vw, 20px);
+            margin-bottom: clamp(20px, 5vw, 30px);
+        }
+
+        .mode-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            padding: clamp(8px, 2.5vw, 12px) clamp(20px, 5vw, 30px);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .mode-btn.active {
+            background: rgba(74, 222, 128, 0.3);
+            border-color: #4ade80;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: clamp(15px, 4vw, 20px);
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            color: #cbd5e0;
+        }
+
+        .quiz-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: clamp(8px, 2vw, 12px);
+            padding: clamp(20px, 5vw, 30px);
+            margin-bottom: clamp(20px, 5vw, 30px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .question-text {
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+            line-height: 1.6;
+            margin-bottom: clamp(15px, 4vw, 20px);
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .character-display {
+            font-size: clamp(3rem, 10vw, 5rem);
+            color: #4ade80;
+            font-weight: bold;
+            text-align: center;
+            margin: clamp(20px, 5vw, 30px) 0;
+            text-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+            font-family: 'Yu Gothic', 'Hiragino Sans', 'Meiryo', sans-serif;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(10px, 3vw, 15px);
+            margin-bottom: clamp(15px, 4vw, 20px);
+        }
+
+        @media (min-width: 768px) {
+            .options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            padding: clamp(12px, 4vw, 15px) clamp(15px, 5vw, 20px);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+            transition: all 0.3s ease;
+            word-break: keep-all;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: rgba(34, 197, 94, 0.3);
+            border-color: #22c55e;
+            color: #ffffff;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #ef4444;
+            color: #ffffff;
+        }
+
+        .next-btn {
+            display: block;
+            margin: clamp(15px, 4vw, 20px) auto 0;
+            background: linear-gradient(45deg, #4ade80, #22c55e);
+            border: none;
+            color: #ffffff;
+            padding: clamp(10px, 3vw, 12px) clamp(25px, 6vw, 30px);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .next-btn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(74, 222, 128, 0.4);
+        }
+
+        .kana-chart-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: clamp(8px, 2vw, 12px);
+            padding: clamp(20px, 5vw, 30px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: clamp(20px, 5vw, 30px);
+        }
+
+        .toggle-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            padding: clamp(8px, 2.5vw, 10px) clamp(15px, 4vw, 20px);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: clamp(0.85rem, 3vw, 1rem);
+            margin: 0 auto clamp(15px, 4vw, 20px);
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .kana-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: clamp(5px, 1.5vw, 10px);
+            font-family: 'Yu Gothic', 'Hiragino Sans', 'Meiryo', sans-serif;
+        }
+
+        .kana-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: clamp(8px, 2vw, 12px);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .kana-char {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .kana-romaji {
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            color: #cbd5e0;
+            margin-top: 4px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: clamp(10px, 3vw, 15px);
+            margin-bottom: clamp(15px, 4vw, 20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            color: #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">日语五十音背诵练习</h1>
+            <p class="subtitle">ひらがな・カタカナ学習システム</p>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="switchMode('hiragana')">平假名 (ひらがな)</button>
+            <button class="mode-btn" onclick="switchMode('katakana')">片假名 (カタカナ)</button>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">进度：0 / 46</div>
+        </div>
+
+        <div class="stats">
+            <span>正确率: <span id="accuracy">0%</span></span> | 
+            <span>已完成: <span id="completed">0</span></span>
+        </div>
+
+        <div class="quiz-section">
+            <div class="question-text" id="question"></div>
+            <div class="character-display" id="characterDisplay"></div>
+            <div class="options" id="options"></div>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题</button>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleChart()">显示/隐藏五十音图</button>
+        
+        <div class="kana-chart-section hidden" id="chartSection">
+            <div class="kana-chart" id="kanaChart"></div>
+        </div>
+    </div>
+
+    <script>
+        const hiraganaData = [
+            {char: 'あ', romaji: 'a'}, {char: 'い', romaji: 'i'}, {char: 'う', romaji: 'u'}, {char: 'え', romaji: 'e'}, {char: 'お', romaji: 'o'},
+            {char: 'か', romaji: 'ka'}, {char: 'き', romaji: 'ki'}, {char: 'く', romaji: 'ku'}, {char: 'け', romaji: 'ke'}, {char: 'こ', romaji: 'ko'},
+            {char: 'さ', romaji: 'sa'}, {char: 'し', romaji: 'shi'}, {char: 'す', romaji: 'su'}, {char: 'せ', romaji: 'se'}, {char: 'そ', romaji: 'so'},
+            {char: 'た', romaji: 'ta'}, {char: 'ち', romaji: 'chi'}, {char: 'つ', romaji: 'tsu'}, {char: 'て', romaji: 'te'}, {char: 'と', romaji: 'to'},
+            {char: 'な', romaji: 'na'}, {char: 'に', romaji: 'ni'}, {char: 'ぬ', romaji: 'nu'}, {char: 'ね', romaji: 'ne'}, {char: 'の', romaji: 'no'},
+            {char: 'は', romaji: 'ha'}, {char: 'ひ', romaji: 'hi'}, {char: 'ふ', romaji: 'fu'}, {char: 'へ', romaji: 'he'}, {char: 'ほ', romaji: 'ho'},
+            {char: 'ま', romaji: 'ma'}, {char: 'み', romaji: 'mi'}, {char: 'む', romaji: 'mu'}, {char: 'め', romaji: 'me'}, {char: 'も', romaji: 'mo'},
+            {char: 'や', romaji: 'ya'}, {char: 'ゆ', romaji: 'yu'}, {char: 'よ', romaji: 'yo'},
+            {char: 'ら', romaji: 'ra'}, {char: 'り', romaji: 'ri'}, {char: 'る', romaji: 'ru'}, {char: 'れ', romaji: 're'}, {char: 'ろ', romaji: 'ro'},
+            {char: 'わ', romaji: 'wa'}, {char: 'ゐ', romaji: 'wi'}, {char: 'ゑ', romaji: 'we'}, {char: 'を', romaji: 'wo'}, {char: 'ん', romaji: 'n'}
+        ];
+
+        const katakanaData = [
+            {char: 'ア', romaji: 'a'}, {char: 'イ', romaji: 'i'}, {char: 'ウ', romaji: 'u'}, {char: 'エ', romaji: 'e'}, {char: 'オ', romaji: 'o'},
+            {char: 'カ', romaji: 'ka'}, {char: 'キ', romaji: 'ki'}, {char: 'ク', romaji: 'ku'}, {char: 'ケ', romaji: 'ke'}, {char: 'コ', romaji: 'ko'},
+            {char: 'サ', romaji: 'sa'}, {char: 'シ', romaji: 'shi'}, {char: 'ス', romaji: 'su'}, {char: 'セ', romaji: 'se'}, {char: 'ソ', romaji: 'so'},
+            {char: 'タ', romaji: 'ta'}, {char: 'チ', romaji: 'chi'}, {char: 'ツ', romaji: 'tsu'}, {char: 'テ', romaji: 'te'}, {char: 'ト', romaji: 'to'},
+            {char: 'ナ', romaji: 'na'}, {char: 'ニ', romaji: 'ni'}, {char: 'ヌ', romaji: 'nu'}, {char: 'ネ', romaji: 'ne'}, {char: 'ノ', romaji: 'no'},
+            {char: 'ハ', romaji: 'ha'}, {char: 'ヒ', romaji: 'hi'}, {char: 'フ', romaji: 'fu'}, {char: 'ヘ', romaji: 'he'}, {char: 'ホ', romaji: 'ho'},
+            {char: 'マ', romaji: 'ma'}, {char: 'ミ', romaji: 'mi'}, {char: 'ム', romaji: 'mu'}, {char: 'メ', romaji: 'me'}, {char: 'モ', romaji: 'mo'},
+            {char: 'ヤ', romaji: 'ya'}, {char: 'ユ', romaji: 'yu'}, {char: 'ヨ', romaji: 'yo'},
+            {char: 'ラ', romaji: 'ra'}, {char: 'リ', romaji: 'ri'}, {char: 'ル', romaji: 'ru'}, {char: 'レ', romaji: 're'}, {char: 'ロ', romaji: 'ro'},
+            {char: 'ワ', romaji: 'wa'}, {char: 'ヰ', romaji: 'wi'}, {char: 'ヱ', romaji: 'we'}, {char: 'ヲ', romaji: 'wo'}, {char: 'ン', romaji: 'n'}
+        ];
+
+        let currentMode = 'hiragana';
+        let currentData = hiraganaData;
+        let shuffledData = [];
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let totalQuestions = 0;
+        let currentAnswered = false;
+
+        function switchMode(mode) {
+            currentMode = mode;
+            currentData = mode === 'hiragana' ? hiraganaData : katakanaData;
+            shuffleQuestions();
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            totalQuestions = 0;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            updateChart();
+            updateStats();
+            updateProgress();
+            displayQuestion();
+        }
+
+        function shuffleQuestions() {
+            shuffledData = [...currentData].sort(() => Math.random() - 0.5);
+        }
+
+        function generateQuestion() {
+            if (currentQuestionIndex >= shuffledData.length) {
+                shuffleQuestions();
+                currentQuestionIndex = 0;
+            }
+            
+            const currentKana = shuffledData[currentQuestionIndex];
+            const correctAnswer = currentKana.romaji;
+            
+            const wrongOptions = [];
+            while (wrongOptions.length < 3) {
+                const randomIndex = Math.floor(Math.random() * currentData.length);
+                const wrongAnswer = currentData[randomIndex].romaji;
+                if (wrongAnswer !== correctAnswer && !wrongOptions.includes(wrongAnswer)) {
+                    wrongOptions.push(wrongAnswer);
+                }
+            }
+
+            const allOptions = [correctAnswer, ...wrongOptions];
+            const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
+
+            return {
+                character: currentKana.char,
+                options: shuffledOptions,
+                correct: correctAnswer,
+                questionNumber: currentQuestionIndex + 1
+            };
+        }
+
+        function displayQuestion() {
+            const questionData = generateQuestion();
+            if (!questionData) return;
+
+            currentQuestion = questionData;
+            currentAnswered = false;
+
+            document.getElementById('question').textContent = 
+                `第 ${questionData.questionNumber} 个字符：请选择正确的读音`;
+            
+            document.getElementById('characterDisplay').textContent = questionData.character;
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            questionData.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectOption(btn, option, questionData.correct);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('nextBtn').classList.remove('show');
+        }
+
+        function selectOption(btn, selected, correct) {
+            if (currentAnswered) return;
+
+            currentAnswered = true;
+            totalQuestions++;
+
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(button => {
+                button.style.pointerEvents = 'none';
+                if (button.textContent === correct) {
+                    button.classList.add('correct');
+                } else if (button !== btn) {
+                    button.classList.add('incorrect');
+                }
+            });
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                correctAnswers++;
+            } else {
+                btn.classList.add('incorrect');
+            }
+
+            updateStats();
+            updateProgress();
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(button => {
+                button.style.pointerEvents = 'auto';
+                button.classList.remove('correct', 'incorrect');
+            });
+
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function updateStats() {
+            const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('completed').textContent = totalQuestions;
+        }
+
+        function updateProgress() {
+            const progress = Math.min(currentQuestionIndex, shuffledData.length);
+            const percentage = (progress / shuffledData.length) * 100;
+            
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `进度：${progress} / ${shuffledData.length}`;
+        }
+
+        function updateChart() {
+            const chartContainer = document.getElementById('kanaChart');
+            chartContainer.innerHTML = '';
+
+            currentData.forEach(kana => {
+                const item = document.createElement('div');
+                item.className = 'kana-item';
+                
+                const char = document.createElement('div');
+                char.className = 'kana-char';
+                char.textContent = kana.char;
+                
+                const romaji = document.createElement('div');
+                romaji.className = 'kana-romaji';
+                romaji.textContent = kana.romaji;
+                
+                item.appendChild(char);
+                item.appendChild(romaji);
+                chartContainer.appendChild(item);
+            });
+        }
+
+        function toggleChart() {
+            const chartSection = document.getElementById('chartSection');
+            chartSection.classList.toggle('hidden');
+        }
+
+        window.onload = function() {
+            shuffleQuestions();
+            updateChart();
+            updateStats();
+            updateProgress();
+            displayQuestion();
+        };
+    </script>
+</body>
+</html>
